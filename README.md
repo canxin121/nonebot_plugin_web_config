@@ -4,6 +4,6 @@
 
 配置项  
 web_user: str = "admin"  
-web_passed: str = "passwd"  
+web_passwd: str = "passwd"  
 web_host: str = "127.0.0.1"  
 web_port: int = 8666  
