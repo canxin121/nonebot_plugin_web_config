@@ -19,15 +19,14 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory=(Root / "templates/static")), name="static")
 
 InvalidCredentialsException = HTTPException(
-    status_code=303,
-    headers={"Location": "/login"}
+    status_code=303, headers={"Location": "/login"}
 )
 
 manager = LoginManager(
     secret="some-secret-key",
     token_url="/login",
     use_cookie=True,
-    custom_exception=InvalidCredentialsException
+    custom_exception=InvalidCredentialsException,
 )
 
 
@@ -55,20 +54,29 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 
 @app.get("/{full_path:path}")
-async def index_page(request: Request, full_path: str, current_user: str = Depends(get_current_user)):
+async def index_page(
+    request: Request, full_path: str, current_user: str = Depends(get_current_user)
+):
     from .util import generate_index
+
     menu, data = generate_index(full_path)
 
-    return templates.TemplateResponse("index.jinja2", {"request": request, "menu": menu, "data": data})
+    return templates.TemplateResponse(
+        "index.jinja2", {"request": request, "menu": menu, "data": data}
+    )
 
 
 @app.post("/{full_path:path}")
-async def index_post(request: Request, full_path: str, current_user: str = Depends(get_current_user)):
+async def index_post(
+    request: Request, full_path: str, current_user: str = Depends(get_current_user)
+):
     await process_data(full_path, request)
 
 
 async def run_server():
-    web_ui_thread = threading.Thread(target=lambda: uvicorn.run(app, host=config.web_host, port=config.web_port))
+    web_ui_thread = threading.Thread(
+        target=lambda: uvicorn.run(app, host=config.web_host, port=config.web_port)
+    )
     web_ui_thread.daemon = True
     web_ui_thread.start()
 
